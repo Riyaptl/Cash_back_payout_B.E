@@ -147,7 +147,7 @@ const readSerials = async (req, res) => {
 
         const serials = await Serial.find(query)
             .populate("winner", "name upi")
-            .sort({ number: 1 })
+            .sort({ createdAt: -1 })
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);
 
@@ -166,6 +166,59 @@ const readSerials = async (req, res) => {
     }
 };
 
+// Generate Serial CSV
+const createCSV = (req, res) => {
+  const priceDistribution = {
+    5: 650,
+    10: 200,
+    20: 100,
+    50: 40,
+    99: 10,
+  };
+
+  const totalRows = Object.values(priceDistribution).reduce((a, b) => a + b, 0);
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  // Generate random code
+  function generateCode(existing) {
+    while (true) {
+      let code = "";
+      for (let i = 0; i < 7; i++) {
+        code += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      const digitCount = (code.match(/\d/g) || []).length;
+      if (digitCount >= 3 && !existing.has(code)) {
+        return code;
+      }
+    }
+  }
+
+  const codes = new Set();
+  const data = [];
+
+  for (const [price, count] of Object.entries(priceDistribution)) {
+    for (let i = 0; i < count; i++) {
+      const code = generateCode(codes);
+      codes.add(code);
+      data.push({ Number: code, Price: price });
+    }
+  }
+
+  // Shuffle data
+  for (let i = data.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [data[i], data[j]] = [data[j], data[i]];
+  }
+
+  // Convert to CSV string
+  let csv = "Number,Price\n";
+  csv += data.map((row) => `${row.Number},${row.Price}`).join("\n");
+
+  // Send as file response
+  res.setHeader("Content-Type", "text/csv");
+  res.setHeader("Content-Disposition", "attachment; filename=random_numbers_prices.csv");
+  res.send(csv);
+}
 
 
-module.exports = { csvImportSerial, createSerial, checkSerial, claimSerial, readSerials }
+module.exports = { csvImportSerial, createSerial, checkSerial, claimSerial, readSerials, createCSV }

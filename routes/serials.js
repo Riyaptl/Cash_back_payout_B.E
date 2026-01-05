@@ -3,7 +3,7 @@ const multer = require("multer");
 const router = express.Router();
 const path = require("path");
 const authenticateUser = require("../middlewares/JwtAuth");
-const { readSerials, csvImportSerial, createSerial, claimSerial, checkSerial } = require("../controllers/serials");
+const { readSerials, csvImportSerial, createSerial, claimSerial, checkSerial, createCSV } = require("../controllers/serials");
 
 
 // Configure Multer
@@ -18,6 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+router.get("/createCSV", createCSV);
 router.post("/csv-import", upload.single("file"), csvImportSerial);
 router.post("/", authenticateUser, createSerial);
 router.post("/check", checkSerial);

@@ -47,3 +47,8 @@ app.listen(process.env.PORT, () => {
 app.use("/api/auth", authRoute)
 app.use("/api/serials", serialsRoute)
 app.use("/api/winners", winnersRoute)
+
+// webhook/cashfree/payout
+app.use("/api/webhook/cashfree/payout", (req, res) => {
+  res.status(200).send("OK");
+});

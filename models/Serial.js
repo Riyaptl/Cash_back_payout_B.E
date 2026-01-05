@@ -11,7 +11,7 @@ const SerialSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["unclaimed", "claimed", "cleared", "checked"],
+    enum: ["unclaimed", "claimed", "cleared", "checked", "failed", "processing"],
     default: "unclaimed"
   },
   winner: {
@@ -24,8 +24,14 @@ const SerialSchema = new mongoose.Schema({
   clearedAt: {
     type: Date
   },
+  failedAt: {
+    type:Date
+  },
   checkedAt: {
     type: Date
+  },
+  payoutID: {
+    type: String
   }
 }, { timestamps: true });
 

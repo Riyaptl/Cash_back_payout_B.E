@@ -14,9 +14,21 @@ const WinnerSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["paid", "unpaid"],
+    enum: ["paid", "unpaid", "failed", "processing"],
     default: "unpaid"
-  }
+  },
+  payoutID: {
+    type: String
+  },
+  reason: {
+    type: String
+  },
+  clearedAt: {
+    type: Date
+  },
+  failedAt: {
+    type:Date
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model("Winner", WinnerSchema);
